@@ -44,6 +44,7 @@ def v_sum_sqrs(v):
     Computes vector sum of squares
     v1 * v1 + ... + vn * vn
     """
+    return v_dot(v, v)
 
 
 def v_magnitude(v):
