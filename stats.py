@@ -1,5 +1,7 @@
 # Basic statistical functions
-import vector
+from math import sqrt
+from vector import v_dot
+
 
 def mean(x):
     """Finds mean value of data set x"""
@@ -31,12 +33,47 @@ def data_range(x):
     """Computes the difference between the maximum and minimum elements of x."""
     return max(x) - min(x)
 
+
 def de_mean(x):
     x_bar = mean(x)
     return [x_i - x_bar for x_i in x]
 
-def variance(x):
-    """assumes x has at least two elements"""
+
+def variance(x, sd = 'population'):
+    """Computes variance (sigma squared) of x"""
+    # Originally was going to borrow from vector, but I think its better standalone in stats.
+    diff_elem_mean = [(elem - mean(x)) ** 2 for elem in x]
+    if sd == 'sample':
+        return sum(diff_elem_mean) / len(diff_elem_mean) - 1
+    else:
+        return mean(diff_elem_mean)
+
+
+def std_deviation(x, sd = 'population'):
+    """
+    Finds the standard deviation of x. Assumes len(x) >= 2.
+    sd = 'sample' for sample calculation
+    """
+    if sd == 'sample':
+        return sqrt(variance(x, sd='sample'))
+    else:
+        return sqrt(variance(x))
+
+
+def interquartile_range(x):
+    return quantile(x, 0.75) - quantile(x, 0.25)
+
+
+def covariance(x, y):
     n = len(x)
-    deviations = de_mean(x)
-    return vector.v_sum_sqrs(deviations) / (n - 1)
+    return v_dot(de_mean(x), de_mean(y)) / (n - 1)
+
+
+def correlation(x, y):
+    # 1 = perfect correlation, -1 perfect anticorrelation
+    stdvx = std_deviation(x)
+    stdvy = std_deviation(y)
+    if stdvx > 0 and stdvy > 0:
+        return covariance(x, y) / stdvx / stdvy
+    else:
+        return 0
